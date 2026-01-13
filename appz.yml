@@ -1,0 +1,72 @@
+app:
+  name: LogCollectorGL
+  code: LCGL
+  notify: apeethambaran@ecloudcontrol.com
+
+build:
+  version: 6.1
+  env: DEV
+  build_file: none
+  output_files: output/*.zip
+  image_template: graylog-6.1
+
+deploy:
+  context: anandp0/DEV
+  type: statefulset
+  replicas: 1
+  port:
+  - 9000
+  - 12201
+  - 9833
+volumes:
+- claim: graylog-data
+  mount: /usr/share/graylog/data/journal
+  size: 5Gi
+  mode: ReadWriteOnce
+  name: graylog-data
+
+monitor:
+  notify: apeethambaran@ecloudcontrol.com    
+
+properties:
+  revision : 19
+  TZ : Asia/Kolkata
+  GRAYLOG_MONGODB_URI : mongodb://mongo-6-0:27017/graylog
+  GRAYLOG_ELASTICSEARCH_HOSTS : http://elasticsearch-2-15-0.elasticsearch-8-15:9200/
+  GRAYLOG_ELASTICSEARCH_DISCOVERY_ENABLED : true
+  GRAYLOG_ROOT_PASSWORD_SHA2 :
+      vault : GRAYLOG_ROOT_PASSWORD_SHA2
+  GRAYLOG_PASSWORD_SECRET :
+      vault : GRAYLOG_PASSWORD_SECRET
+  NODE_MODE : single-node
+  RETENTION_ENABLE : 1
+  ELASTICSEARCH_INDEX_TIME : PT1H
+  ELASTICSEARCH_TOTAL_INDICES : 1095
+  ELASTICSEARCH_NUMBEROF_REPLICAS : 1
+  CLEAR_JOURNAL : 1
+  GRAYLOG_PROCESSBUFFER_PROCESSORS : 12
+  GRAYLOG_OUTPUTBUFFER_PROCESSORS : 6
+  OUTPUT_BATCH_SIZE : 500
+  AUTH_EMAIL_ENABLE: 1
+  GRAYLOG_TRANSPORT_EMAIL_HOSTNAME: mail.authsmtp.com
+  GRAYLOG_TRANSPORT_EMAIL_PORT: 2525
+  GRAYLOG_TRANSPORT_EMAIL_USE_AUTH: true
+  GRAYLOG_TRANSPORT_EMAIL_USE_TLS: false
+  GRAYLOG_TRANSPORT_EMAIL_USE_SSL: false
+  GRAYLOG_TRANSPORT_EMAIL_AUTH_USERNAME: ac75928
+  GRAYLOG_TRANSPORT_EMAIL_AUTH_PASSWORD:
+    vault: GRAYLOG_TRANSPORT_EMAIL_AUTH_PASSWORD
+  GRAYLOG_TRANSPORT_EMAIL_SUBJECT_PREFIX: [graylog]
+  GRAYLOG_TRANSPORT_EMAIL_FROM_EMAIL: appzdev@cloudbourne.co
+  #JAVA_HEAP_SIZE : 12g
+  JAVA_HEAP_SIZE : 4g
+  RING_SIZE : 131072
+  GRAYLOG_PROMETHEUS_EXPORTER_ENABLED : true
+  GRAYLOG_PROMETHEUS_EXPORTER_BIND_ADDRESS : 0.0.0.0:9833
+  MINIO_HOSTNAME : http://minio-2-0:9000
+  MINIO_BUCKET : graylog-audit
+  MINIO_ACCESS_KEY : 
+    vault: MINIO_ACCESS_KEY
+  MINIO_SECRET_KEY: 
+    vault: MINIO_SECRET_KEY
+  MINIO_BACKUP_TIME : 07
